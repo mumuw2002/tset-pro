@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: my-project
+    env: node
+    buildCommand: npm install
+    startCommand: node app.js
+    repo: https://github.com/mumuw2002/deployproject-test_task.git
