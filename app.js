@@ -4,7 +4,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // เชื่อมต่อ MongoDB (แทนที่ <YOUR_MONGODB_URI> ด้วย URI จริง)
-mongoose.connect('<YOUR_MONGODB_URI>', {
+mongoose.connect('mongodb+srv://admin:1234@cluster0.uku92.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
