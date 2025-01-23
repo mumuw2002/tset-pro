@@ -1,40 +1,78 @@
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const expressLayouts = require('express-ejs-layouts');
+const methodOverride = require('method-override');
+const connectDB = require('./server/config/db');
+const session = require('express-session');
+const passport = require('passport');
+const MongoStore = require('connect-mongo');
+const path = require('path');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const flash = require('connect-flash');
+
+require('./server/config/passport');
+require('dotenv').config();
+
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5001;
 
-// เชื่อมต่อ MongoDB (แทนที่ <YOUR_MONGODB_URI> ด้วย URI จริง)
-mongoose.connect('mongodb+srv://admin:1234@cluster0.uku92.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// Middleware สำหรับ parse body
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-// สร้าง Schema
-const itemSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-});
+// เชื่อมต่อ MongoDB
+connectDB()
+    .then(() => {
+        console.log('Connected to database');
+    })
+    .catch(err => {
+        console.error('Failed to connect to database:', err);
+        process.exit(1);
+    });
 
-// สร้าง Model
-const Item = mongoose.model('Item', itemSchema);
+    app.use(
+        session({
+          secret: process.env.SESSION_SECRET,
+          resave: false,
+          saveUninitialized: false,
+          store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }), 
+          cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+          },
+        })
+      );
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Middleware to parse JSON requests
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(flash());
 
 // ตั้งค่า EJS เป็น template engine
+app.use(expressLayouts);
+app.set('layout', 'layouts/main'); 
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // กำหนด public folder
 app.use(express.static('public'));
 
-// Route สำหรับหน้าแรก
-app.get('/', async (req, res) => {
-  try {
-    const items = await Item.find({});
-    res.render('index', { items: items });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error retrieving items');
-  }
+// Routes setup
+app.use('/', require('./server/routes/authRoutes'));
+app.use('/', require('./server/routes/indexRoutes'));
+app.use('/', require('./server/routes/spaceRoutes'));
+
+app.get('*', (req, res) => {
+    res.status(404).render('404');
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+    console.log(`Server listening at http://localhost:${port}`);
 });
