@@ -1,6 +1,6 @@
 // server/controllers/authController.js
 const User = require('../models/User');
-const bcrypt = require('bcrypt'); // อย่าลืมติดตั้ง bcrypt ด้วยนะครับ
+const bcrypt = require('bcryptjs'); // อย่าลืมติดตั้ง bcrypt ด้วยนะครับ
 
 
 exports.loginPage = (req, res) => {
