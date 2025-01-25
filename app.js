@@ -21,14 +21,6 @@ const port = process.env.PORT || 5001;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Set Content Security Policy header
-app.use((req, res, next) => {
-  res.setHeader("Content-Security-Policy", 
-      "default-src 'none'; img-src 'self' data:; script-src 'self'; style-src 'self';");
-  next();
-});
-
-
 // เชื่อมต่อ MongoDB
 connectDB()
     .then(() => {
@@ -48,8 +40,7 @@ connectDB()
           cookie: {
             secure: process.env.NODE_ENV === 'production',
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-            sameSite: 'Lax',
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
           },
         })
       );
