@@ -34,11 +34,9 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
               aria-expanded="false">
-              <img 
-                src="<%= user.profileImage %>" 
-                alt="<%= user.username %>'s Profile Image" 
-                onerror="this.onerror=null; this.src='/public/img/profileImage/userDefalt.jpg';"
-                />
+              <img src="<%= user ? user.profileImage : '/public/img/profileImage/userDefalt.jpg' %>"
+                alt="<%= user ? user.username : 'Guest' %>'s Profile Image"
+                onerror="this.onerror=null; this.src='/public/img/profileImage/userDefalt.jpg';" />
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li>
@@ -84,14 +82,14 @@
     <header class="headInfo">
       <div class="image-text">
         <span class="image">
-          <img 
-            src="<%= user.profileImage %>" 
-            alt="<%= user.username %>'s Profile Image" 
-            onerror="this.onerror=null; this.src='/public/img/profileImage/userDefalt.jpg';"
-             />
+          <img src="<%= user ? user.profileImage : '/public/img/profileImage/userDefalt.jpg' %>"
+            alt="<%= user ? user.username : 'Guest' %>'s Profile Image"
+            onerror="this.onerror=null; this.src='/public/img/profileImage/userDefalt.jpg';" />
         </span>
         <div class="text header-text">
-          <span class="name"><%= user.username %></span>
+          <span class="name">
+            <%= user.username %>
+          </span>
           <span class="user_id">#<%= user.userid %></span>
         </div>
       </div>
@@ -118,7 +116,8 @@
           <div class="spaceopt">
             <i class="bx bx-plus"></i>
             <li class="space-nav-item dropdown">
-              <a class="space-nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="space-nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 <i class="bx bx-dots-horizontal-rounded"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -143,35 +142,42 @@
         </div>
         <div class="spaceitem-all">
           <div class="scollitem">
-            <% if (spaces && spaces.length > 0) { %>
-            <% spaces.forEach(function(space) { %>
+            <% if (spaces && spaces.length> 0) { %>
+              <% spaces.forEach(function(space) { %>
 
-            <ul class="spaceitem">
-              <li class="itemDetail">
-                <div class="spaceicon">
-                  <span id="spaceicon"><%= space.SpaceName.charAt(0) %></span>
-                  <span id="spacename"><%= space.SpaceName %></span> <!-- Use space instead of spaces[i] -->
-                </div>
-                <div class="spaceoption">
-                  <a class="space-nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bx bx-dots-horizontal-rounded"></i>
-                  </a>
-                  <ul class="dropdown-menu" aria-labelledby="spaceDropdown">
-                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-pen"></i> เปลี่ยนชื่อ</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear"></i> ตั้งค่าพื้นที่</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-star"></i> ติดดาว</a></li>
-                    <li>
-                      <hr class="dropdown-divider" />
-                    </li>
-                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box-archive"></i> จัดเก็บพื้นที่</a></li>
-                    <li><a class="dropdown-item no-hover" href="#" style="color: red"><i class="fa-solid fa-trash" style="color: red"></i> ลบพื้นที่</a></li>
-                  </ul>
-                </div>
-              </li>
+                <ul class="spaceitem">
+                  <li class="itemDetail">
+                    <div class="spaceicon">
+                      <span id="spaceicon">
+                        <%= space.SpaceName.charAt(0) %>
+                      </span>
+                      <span id="spacename">
+                        <%= space.SpaceName %>
+                      </span> <!-- Use space instead of spaces[i] -->
+                    </div>
+                    <div class="spaceoption">
+                      <a class="space-nav-link dropdown-toggle" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bx bx-dots-horizontal-rounded"></i>
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="spaceDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-pen"></i> เปลี่ยนชื่อ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear"></i> ตั้งค่าพื้นที่</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-star"></i> ติดดาว</a></li>
+                        <li>
+                          <hr class="dropdown-divider" />
+                        </li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box-archive"></i> จัดเก็บพื้นที่</a>
+                        </li>
+                        <li><a class="dropdown-item no-hover" href="#" style="color: red"><i class="fa-solid fa-trash"
+                              style="color: red"></i> ลบพื้นที่</a></li>
+                      </ul>
+                    </div>
+                  </li>
 
-            </ul>
-            <% }); %>
-            <% } %>
+                </ul>
+                <% }); %>
+                  <% } %>
           </div>
         </div>
       </div>

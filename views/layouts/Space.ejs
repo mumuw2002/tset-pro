@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/css/subjectCss/subject.css">
 </head>
 <body>
-  <%- include('../partials/sideNav.ejs') %>
+  <%- include('../partials/sideNav.ejs', { user: user || {} }) %>
   <main>
     <%- body %>
   </main>
