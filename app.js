@@ -10,6 +10,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
+const helmet = require('helmet'); // เพิ่ม helmet สำหรับ CSP
 
 require('./server/config/passport');
 require('dotenv').config();
@@ -31,32 +32,54 @@ connectDB()
         process.exit(1);
     });
 
-    app.use(
-        session({
-          secret: process.env.SESSION_SECRET,
-          resave: false,
-          saveUninitialized: false,
-          store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }), 
-          cookie: {
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+        cookie: {
             secure: process.env.NODE_ENV === 'production',
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000, // 24 hours
-          },
-        })
-      );
+        },
+    })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // Middleware to parse JSON requests
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(flash());
 
+// ตั้งค่า CSP
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: [
+                "'self'",
+                'https://cdn.jsdelivr.net',
+                'https://fonts.googleapis.com',
+                "'unsafe-inline'", // อนุญาต inline styles (ถ้าจำเป็น)
+            ],
+            fontSrc: [
+                "'self'",
+                'https://fonts.gstatic.com',
+                'https://fonts.googleapis.com',
+            ],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // อนุญาต inline scripts (ถ้าจำเป็น)
+            imgSrc: ["'self'", 'data:', 'https://deployproject-test-task.onrender.com'], // อนุญาตรูปภาพจากแหล่งต่างๆ
+        },
+    })
+);
+
 // ตั้งค่า EJS เป็น template engine
 app.use(expressLayouts);
-app.set('layout', 'layouts/main'); 
+app.set('layout', 'layouts/main');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
