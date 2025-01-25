@@ -6,7 +6,7 @@ exports.SpaceDashboard = async (req, res) => {
     try {
         const spaces = await Space.find(); // ดึงข้อมูล spaces จากฐานข้อมูล
         res.render("space/space-dashboard", {
-            layout: "../views/layouts/space",
+            layout: "layouts/space", // เปลี่ยนเป็นเส้นทางสัมบูรณ์
             user: req.user,
             spaces: spaces
         });
