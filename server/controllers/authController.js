@@ -1,13 +1,12 @@
-// server/controllers/authController.js
+const passport = require('passport'); // เพิ่มบรรทัดนี้
 const User = require('../models/User');
-const bcrypt = require('bcryptjs'); // อย่าลืมติดตั้ง bcrypt ด้วยนะครับ
-
+const bcrypt = require('bcryptjs');
 
 exports.loginPage = (req, res) => {
-  res.render('log/login', { 
-    title: 'เข้าสู่ระบบ', 
+  res.render('log/login', {
+    title: 'เข้าสู่ระบบ',
     description: 'เข้าสู่ระบบ Task Management App',
-    error: req.flash('error') 
+    error: req.flash('error'),
   });
 };
 
@@ -15,14 +14,14 @@ exports.login = (req, res, next) => {
   passport.authenticate('local', {
     successRedirect: '/space',
     failureRedirect: '/login',
-    failureFlash: true
+    failureFlash: true,
   })(req, res, next);
 };
 
 exports.registerForm = (req, res) => {
-  res.render('log/register', { 
-    title: 'สมัครสมาชิก', 
-    description: 'สมัครสมาชิก Task Management App' 
+  res.render('log/register', {
+    title: 'สมัครสมาชิก',
+    description: 'สมัครสมาชิก Task Management App',
   });
 };
 
@@ -39,12 +38,12 @@ exports.registerUser = async (req, res) => {
       errors.push('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร');
     }
     if (errors.length > 0) {
-      return res.render('log/register', { 
-        errors, 
-        username, 
-        googleEmail, 
-        password, 
-        confirmPassword 
+      return res.render('log/register', {
+        errors,
+        username,
+        googleEmail,
+        password,
+        confirmPassword,
       });
     }
 
@@ -56,23 +55,22 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash รหัสผ่าน
-    const saltRounds = 10; // กำหนดจำนวน salt rounds
-    const hashedPassword = await bcrypt.hash(password, saltRounds); 
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // สร้าง user ใหม่
     const user = new User({
       username,
       googleEmail,
-      password: hashedPassword // บันทึกรหัสผ่านที่ hash แล้ว
+      password: hashedPassword,
     });
     await user.save();
 
     req.flash('success_msg', 'สมัครสมาชิกเรียบร้อยแล้ว!');
-    res.redirect('/login'); 
-
+    res.redirect('/login');
   } catch (err) {
     console.error(err);
-    if (err.code === 11000) { // duplicate key error
+    if (err.code === 11000) {
       req.flash('error', 'อีเมลนี้ถูกใช้ไปแล้ว');
     } else {
       req.flash('error', 'เกิดข้อผิดพลาดในการสมัครสมาชิก');
@@ -83,7 +81,9 @@ exports.registerUser = async (req, res) => {
 
 exports.logout = (req, res, next) => {
   req.logout((err) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     res.redirect('/');
   });
 };
