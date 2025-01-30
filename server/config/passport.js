@@ -1,7 +1,10 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/User'); // Adjust the path as necessary
+const LocalStrategy = require('passport-local').Strategy; // เพิ่มบรรทัดนี้
+const bcrypt = require('bcryptjs');
+const User = require('../models/User'); // ตรวจสอบเส้นทางให้ถูกต้อง
 
+// Google Strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -11,14 +14,17 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const existingUser = await User.findOne({ googleEmail: profile.emails[0].value });
+        const googleEmail = profile.emails?.[0]?.value || 'no-email'; // จัดการกรณีไม่มีอีเมล
+        const profileImage = profile.photos?.[0]?.value || '/img/profileImage/Profile.jpeg'; // จัดการกรณีไม่มีรูป
+
+        const existingUser = await User.findOne({ googleEmail });
         if (existingUser) return done(null, existingUser);
 
         const newUser = new User({
           googleId: profile.id,
-          googleEmail: profile.emails[0].value,
+          googleEmail,
           username: profile.displayName || 'User',
-          profileImage: profile.photos[0]?.value || '/img/profileImage/Profile.jpeg',
+          profileImage,
         });
         const savedUser = await newUser.save();
         return done(null, savedUser);
@@ -36,6 +42,10 @@ passport.use(
       const user = await User.findOne({ googleEmail: email });
       if (!user) {
         return done(null, false, { message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+      }
+
+      if (!user.password) {
+        return done(null, false, { message: 'บัญชีนี้ไม่ได้ลงทะเบียนด้วยอีเมลและรหัสผ่าน' });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
