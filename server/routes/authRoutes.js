@@ -17,7 +17,7 @@ router.get(
 
 
 // Local Authentication
-router.get("/login", authController.loginPage);
+router.get('/login', authController.loginPage);
 router.post("/login", authController.login);
 
 router.get('/register', authController.registerForm);
